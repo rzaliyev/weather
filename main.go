@@ -11,7 +11,11 @@ import (
 )
 
 const APIkey = "8ac4791f20af452e978111630222805"
-const AksaiLatLong = "51.17,53.01"
+
+var cities = map[string]string{
+	"Aksai":  "51.17,53.02",
+	"Uralsk": "51.22, 51.38",
+}
 
 type Response struct {
 	Location `json:"location"`
@@ -44,9 +48,10 @@ func main() {
 		query = "auto:ip"
 	} else {
 		query = os.Args[1]
-		if query == "Aksai" {
-			query = AksaiLatLong
+		if val, ok := cities[query]; ok {
+			query = val
 		}
+
 	}
 
 	endPoint, err := url.Parse("http://api.weatherapi.com/v1/current.json")
