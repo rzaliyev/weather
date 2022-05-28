@@ -8,64 +8,37 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync"
 )
-
-const APIkey = "8ac4791f20af452e978111630222805"
-
-var cities = map[string]string{
-	"Aksai":  "51.17,53.02",
-	"Uralsk": "51.22, 51.38",
-}
-
-type Response struct {
-	Location `json:"location"`
-	Current  `json:"current"`
-}
-
-type Location struct {
-	Name    string  `json:"name"`
-	Country string  `json:"country"`
-	Lat     float32 `json:"lat"`
-	Long    float32 `json:"lon"`
-	TzID    string  `json:"tz_id"`
-}
-
-type Current struct {
-	Temperature float32 `json:"temp_c"`
-	Wind        float32 `json:"wind_kph"`
-	WindDir     string  `json:"wind_dir"`
-	Condition   `json:"condition"`
-}
-
-type Condition struct {
-	Text string `json:"text"`
-}
 
 func main() {
 
-	var query string
 	if len(os.Args) < 2 {
-		query = "auto:ip"
+		getWeather("auto:ip")
 	} else {
-		query = os.Args[1]
-		if val, ok := cities[query]; ok {
-			query = val
+		var wg sync.WaitGroup
+		for _, v := range os.Args[1:] {
+			query := getQuery(v)
+			wg.Add(1)
+			go func() {
+				getWeather(query)
+				wg.Done()
+			}()
 		}
-
+		wg.Wait()
 	}
+}
 
-	endPoint, err := url.Parse("http://api.weatherapi.com/v1/current.json")
-	if err != nil {
-		log.Fatal(err)
+func getQuery(query string) string {
+	if val, ok := cities[query]; ok {
+		return val
 	}
+	return query
+}
 
-	values := url.Values{}
-	values.Add("key", APIkey)
-	values.Add("q", query)
-	values.Add("aqi", "no")
+func getWeather(query string) {
 
-	endPoint.RawQuery = values.Encode()
-	resp, err := http.Get(endPoint.String())
+	resp, err := http.Get(createAPIQuery(query))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -81,6 +54,27 @@ func main() {
 		log.Fatal(err)
 	}
 
+	printWeather(weather)
+
+}
+
+func createAPIQuery(query string) string {
+	endPoint, err := url.Parse(APIurl)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	values := url.Values{}
+	values.Add("key", APIkey)
+	values.Add("q", query)
+	values.Add("aqi", "no")
+
+	endPoint.RawQuery = values.Encode()
+
+	return endPoint.String()
+}
+
+func printWeather(weather Response) {
 	var location string
 	if weather.Country == weather.Name {
 		location = weather.Country
