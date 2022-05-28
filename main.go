@@ -19,25 +19,19 @@ func main() {
 	} else {
 		var wg sync.WaitGroup
 		for _, v := range os.Args[1:] {
-			query := getQuery(v)
 			wg.Add(1)
-			go func() {
+			go func(query string) {
 				getWeather(query)
 				wg.Done()
-			}()
+			}(v)
 		}
 		wg.Wait()
 	}
 }
 
-func getQuery(query string) string {
-	if val, ok := cities[strings.ToLower(query)]; ok {
-		return val
-	}
-	return query
-}
-
 func getWeather(query string) {
+
+	query = convertQuery(query)
 
 	resp, err := http.Get(createAPIQuery(query))
 	if err != nil {
@@ -57,6 +51,13 @@ func getWeather(query string) {
 
 	printWeather(weather)
 
+}
+
+func convertQuery(query string) string {
+	if val, ok := cities[strings.ToLower(query)]; ok {
+		return val
+	}
+	return query
 }
 
 func createAPIQuery(query string) string {
