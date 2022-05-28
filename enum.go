@@ -6,6 +6,6 @@ const (
 )
 
 var cities = map[string]string{
-	"Aksai":  "51.17,53.02",
-	"Uralsk": "51.22, 51.38",
+	"aksai":  "51.17,53.02",
+	"uralsk": "51.22, 51.38",
 }

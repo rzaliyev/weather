@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"sync"
 )
 
@@ -30,7 +31,7 @@ func main() {
 }
 
 func getQuery(query string) string {
-	if val, ok := cities[query]; ok {
+	if val, ok := cities[strings.ToLower(query)]; ok {
 		return val
 	}
 	return query
