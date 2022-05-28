@@ -39,12 +39,14 @@ type Condition struct {
 
 func main() {
 
+	var query string
 	if len(os.Args) < 2 {
-		os.Exit(1)
-	}
-	query := os.Args[1]
-	if query == "Aksai" {
-		query = AksaiLatLong
+		query = "auto:ip"
+	} else {
+		query = os.Args[1]
+		if query == "Aksai" {
+			query = AksaiLatLong
+		}
 	}
 
 	endPoint, err := url.Parse("http://api.weatherapi.com/v1/current.json")
