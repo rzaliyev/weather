@@ -1,0 +1,98 @@
+{
+    "location": {
+        "name": "Peremetnoe",
+        "region": "West Kazakhstan",
+        "country": "Kazakhstan",
+        "lat": 51.18,
+        "lon": 50.82,
+        "tz_id": "Asia/Oral",
+        "localtime_epoch": 1653799283,
+        "localtime": "2022-05-29 9:41"
+    },
+    "current": {
+        "last_updated_epoch": 1653798600,
+        "last_updated": "2022-05-29 09:30",
+        "temp_c": 16.1,
+        "is_day": 1,
+        "condition": {
+            "text": "Light rain shower",
+            "icon": "//cdn.weatherapi.com/weather/64x64/day/353.png",
+            "code": 1240
+        },
+        "wind_kph": 5.0,
+        "wind_degree": 307,
+        "wind_dir": "NW",
+        "pressure_mb": 1016.0,
+        "precip_mm": 0.2,
+        "humidity": 87,
+        "cloud": 80,
+        "feelslike_c": 16.1,
+        "vis_km": 10.0,
+        "uv": 4.0,
+        "gust_kph": 7.6
+    },
+    "forecast": {
+        "forecastday": [
+            {
+                "date": "2022-05-29",
+                "day": {
+                    "maxtemp_c": 25.3,
+                    "mintemp_c": 14.3,
+                    "maxwind_kph": 23.0,
+                    "daily_chance_of_rain": 89,
+                    "condition": {
+                        "text": "Patchy rain possible",
+                        "icon": "//cdn.weatherapi.com/weather/64x64/day/176.png",
+                        "code": 1063
+                    },
+                    "uv": 6.0
+                },
+                "astro": {
+                    "sunrise": "05:32 AM",
+                    "sunset": "09:41 PM",
+                    "moon_phase": "New Moon"
+                }
+            },
+            {
+                "date": "2022-05-30",
+                "day": {
+                    "maxtemp_c": 23.7,
+                    "mintemp_c": 14.5,
+                    "maxwind_kph": 23.0,
+                    "daily_chance_of_rain": 82,
+                    "condition": {
+                        "text": "Patchy rain possible",
+                        "icon": "//cdn.weatherapi.com/weather/64x64/day/176.png",
+                        "code": 1063
+                    },
+                    "uv": 6.0
+                },
+                "astro": {
+                    "sunrise": "05:31 AM",
+                    "sunset": "09:42 PM",
+                    "moon_phase": "New Moon"
+                }
+            },
+            {
+                "date": "2022-05-31",
+                "day": {
+                    "maxtemp_c": 22.7,
+                    "mintemp_c": 12.6,
+                    "maxwind_kph": 19.8,
+                    "daily_chance_of_rain": 0,
+                    "condition": {
+                        "text": "Sunny",
+                        "icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
+                        "code": 1000
+                    },
+                    "uv": 6.0
+                },
+                "astro": {
+                    "sunrise": "05:30 AM",
+                    "sunset": "09:44 PM",
+                    "moon_phase": "New Moon"
+                }
+            }
+        ]
+    }
+}

@@ -29,6 +29,27 @@ func (wt WeatherTime) Format(s string) string {
 	return t.Format(s)
 }
 
+type WeatherDay time.Time
+
+func (wd *WeatherDay) UnmarshalJSON(b []byte) error {
+	s := strings.Trim(string(b), "\"")
+	t, err := time.Parse("2006-01-02", s)
+	if err != nil {
+		return err
+	}
+	*wd = WeatherDay(t)
+	return nil
+}
+
+func (wd WeatherDay) MarshalJSON() ([]byte, error) {
+	return json.Marshal(time.Time(wd).Format("2006-01-02"))
+}
+
+func (wd WeatherDay) Format(s string) string {
+	t := time.Time(wd)
+	return t.Format(s)
+}
+
 type WeatherBool bool
 
 func (wb *WeatherBool) UnmarshalJSON(b []byte) error {
@@ -64,6 +85,7 @@ func (wb WeatherBool) MarshalJSON() ([]byte, error) {
 type Response struct {
 	Location `json:"location"`
 	Current  `json:"current"`
+	Forecast `json:"forecast"`
 }
 
 type Location struct {
@@ -100,4 +122,29 @@ type Condition struct {
 	Text string `json:"text"`
 	Icon string `json:"icon"`
 	Code int    `json:"code"`
+}
+
+type Forecast struct {
+	ForecastDays []ForecastDay `json:"forecastday"`
+}
+
+type ForecastDay struct {
+	Date  WeatherDay `json:"date"`
+	Day   `json:"day"`
+	Astro `json:"astro"`
+}
+
+type Day struct {
+	MaxTemp      float32 `json:"maxtemp_c"`
+	MinTemp      float32 `json:"mintemp_c"`
+	MaxWind      float32 `json:"maxwind_kph"`
+	ChanceOfRain int     `json:"daily_chance_of_rain"`
+	Condition    `json:"condition"`
+	UV           float32 `json:"uv"`
+}
+
+type Astro struct {
+	Sunrise   string `json:"sunrise"`
+	Sunset    string `json:"sunset"`
+	MoonPhase string `json:"moon_phase"`
 }
