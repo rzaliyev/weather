@@ -8,11 +8,14 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 )
 
 var debug = flag.Bool("debug", false, "show orgingal respons in JSON format")
+var days = flag.Int("days", 0, "set forecast days")
+var forecast = flag.Bool("f", false, "query forecast for 3 days")
 
 func main() {
 
@@ -80,15 +83,26 @@ func convertQuery(query string) string {
 }
 
 func createAPIQuery(query string) string {
-	endPoint, err := url.Parse(APIurl)
-	if err != nil {
-		log.Fatal(err)
-	}
 
+	var APIurl = APIcurrent
 	values := url.Values{}
 	values.Add("key", APIkey)
 	values.Add("q", query)
 	values.Add("aqi", "no")
+
+	if *forecast {
+		*days = 3
+	}
+
+	if *days > 0 {
+		APIurl = APIforecast
+		values.Add("days", strconv.Itoa(*days))
+	}
+
+	endPoint, err := url.Parse(APIurl)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	endPoint.RawQuery = values.Encode()
 
@@ -96,18 +110,43 @@ func createAPIQuery(query string) string {
 }
 
 func printWeather(weather Response) {
-	var location string
-	if weather.Country == weather.Name {
-		location = weather.Country
+
+	if *days > 0 {
+		printForecastWeather(weather)
 	} else {
-		location = fmt.Sprintf("%v/%v", weather.Country, weather.Name)
+		printCurrentWeather(weather)
+	}
+}
+
+func printCurrentWeather(weather Response) {
+	fmt.Printf("Current weather for %s:\n", getLocation(weather))
+	fmt.Printf("temp: %v °C (feels %v °C), wind: %v kph %q, UV: %v, %s\n",
+		weather.Temperature, weather.FeelsLike, weather.Wind, weather.WindDir, weather.UV, weather.Text)
+}
+
+func getLocation(weather Response) (location string) {
+
+	if val, ok := geos[fmt.Sprintf("%v, %v", weather.Location.Lat, weather.Location.Long)]; ok {
+		weather.Name = val
+	}
+
+	if weather.Country == weather.Name {
+		location = fmt.Sprintf("%v/%v/Lat:%v,Lon:%v", weather.Country, weather.Region, weather.Location.Lat, weather.Location.Long)
+	} else {
+		location = fmt.Sprintf("%v/%v/%v", weather.Country, weather.Region, weather.Name)
 	}
 
 	if location == "" {
 		log.Fatal("unknown location")
 	}
+	return
+}
 
-	fmt.Printf("temp: %v °C, %s, wind: %v kph %q (%s)\n",
-		weather.Temperature, weather.Text, weather.Wind, weather.WindDir,
-		location)
+func printForecastWeather(weather Response) {
+	fmt.Printf("Forecast for %s:\n", getLocation(weather))
+	for _, day := range weather.ForecastDays {
+		fmt.Printf("[%v] min: %v °C, max: %v °C, rain: %d%% wind: %v kph, UV: %v, %s\n",
+			day.Date.Format("2006-01-02"),
+			day.Day.MinTemp, day.Day.MaxTemp, day.Day.ChanceOfRain, day.Day.MaxWind, day.Day.UV, day.Day.Condition.Text)
+	}
 }

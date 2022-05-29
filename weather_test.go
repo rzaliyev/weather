@@ -10,7 +10,7 @@ import (
 func TestCurrentWeather(t *testing.T) {
 
 	t.Run("test current weather", func(t *testing.T) {
-		data, err := ioutil.ReadFile("current_sample.json")
+		data, err := ioutil.ReadFile("samples/current_sample.json")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -19,7 +19,7 @@ func TestCurrentWeather(t *testing.T) {
 	})
 
 	t.Run("test forecast weather", func(t *testing.T) {
-		data, err := ioutil.ReadFile("forecast_sample.json")
+		data, err := ioutil.ReadFile("samples/forecast_sample.json")
 		if err != nil {
 			t.Fatal(err)
 		}
