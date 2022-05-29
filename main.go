@@ -19,16 +19,18 @@ var forecast = flag.Bool("f", false, "query forecast for 3 days")
 
 func main() {
 
+	cfg := GetConfig()
+
 	flag.Parse()
 
 	if len(flag.Args()) < 1 {
-		getWeather("auto:ip")
+		getWeather(cfg, "auto:ip")
 	} else {
 		var wg sync.WaitGroup
 		for _, v := range flag.Args() {
 			wg.Add(1)
 			go func(query string) {
-				getWeather(query)
+				getWeather(cfg, query)
 				wg.Done()
 			}(v)
 		}
@@ -36,11 +38,11 @@ func main() {
 	}
 }
 
-func getWeather(query string) {
+func getWeather(cfg *Config, query string) {
 
-	query = convertQuery(query)
+	query = convertQuery(cfg, query)
 
-	resp, err := http.Get(createAPIQuery(query))
+	resp, err := http.Get(createAPIQuery(cfg, query))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +64,7 @@ func getWeather(query string) {
 		}
 
 	} else {
-		printWeather(*weather)
+		printWeather(cfg, *weather)
 	}
 
 }
@@ -75,18 +77,22 @@ func GetCurrentWeather(b []byte) (resp *Response) {
 	return
 }
 
-func convertQuery(query string) string {
-	if val, ok := cities[strings.ToLower(query)]; ok {
-		return val
+// find special cases form the configuration
+func convertQuery(cfg *Config, query string) string {
+
+	for _, v := range cfg.Cities {
+		if strings.EqualFold(query, v.Name) {
+			return fmt.Sprintf("%v,%v", v.Lat, v.Lon)
+		}
 	}
 	return query
 }
 
-func createAPIQuery(query string) string {
+func createAPIQuery(cfg *Config, query string) string {
 
 	var APIurl = APIcurrent
 	values := url.Values{}
-	values.Add("key", APIkey)
+	values.Add("key", cfg.APIkey)
 	values.Add("q", query)
 	values.Add("aqi", "no")
 
@@ -109,25 +115,27 @@ func createAPIQuery(query string) string {
 	return endPoint.String()
 }
 
-func printWeather(weather Response) {
+func printWeather(cfg *Config, weather Response) {
 
 	if *days > 0 {
-		printForecastWeather(weather)
+		printForecastWeather(cfg, weather)
 	} else {
-		printCurrentWeather(weather)
+		printCurrentWeather(cfg, weather)
 	}
 }
 
-func printCurrentWeather(weather Response) {
-	fmt.Printf("Current weather for %s:\n", getLocation(weather))
+func printCurrentWeather(cfg *Config, weather Response) {
+	fmt.Printf("Current weather for %s:\n", getLocation(cfg, weather))
 	fmt.Printf("temp: %v °C (feels %v °C), wind: %v kph %q, UV: %v, %s\n",
 		weather.Temperature, weather.FeelsLike, weather.Wind, weather.WindDir, weather.UV, weather.Text)
 }
 
-func getLocation(weather Response) (location string) {
+func getLocation(cfg *Config, weather Response) (location string) {
 
-	if val, ok := geos[fmt.Sprintf("%v, %v", weather.Location.Lat, weather.Location.Long)]; ok {
-		weather.Name = val
+	for _, v := range cfg.Cities {
+		if v.Lat == weather.Lat && v.Lon == weather.Long {
+			weather.Name = v.Name
+		}
 	}
 
 	if weather.Country == weather.Name {
@@ -142,8 +150,8 @@ func getLocation(weather Response) (location string) {
 	return
 }
 
-func printForecastWeather(weather Response) {
-	fmt.Printf("Forecast for %s:\n", getLocation(weather))
+func printForecastWeather(cfg *Config, weather Response) {
+	fmt.Printf("Forecast for %s:\n", getLocation(cfg, weather))
 	for _, day := range weather.ForecastDays {
 		fmt.Printf("[%v] min: %v °C, max: %v °C, rain: %d%% wind: %v kph, UV: %v, %s\n",
 			day.Date.Format("2006-01-02"),
