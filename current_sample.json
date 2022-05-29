@@ -1,0 +1,34 @@
+{
+  "location": {
+    "name": "Peremetnoe",
+    "region": "West Kazakhstan",
+    "country": "Kazakhstan",
+    "lat": 51.18,
+    "lon": 50.82,
+    "tz_id": "Asia/Oral",
+    "localtime_epoch": 1653796370,
+    "localtime": "2022-05-29 8:52"
+  },
+  "current": {
+    "last_updated_epoch": 1653795900,
+    "last_updated": "2022-05-29 08:45",
+    "temp_c": 15.6,
+    "is_day": 1,
+    "condition": {
+      "text": "Cloudy",
+      "icon": "//cdn.weatherapi.com/weather/64x64/day/119.png",
+      "code": 1006
+    },
+    "wind_kph": 5.8,
+    "wind_degree": 318,
+    "wind_dir": "NW",
+    "pressure_mb": 1015.0,
+    "precip_mm": 0.0,
+    "humidity": 91,
+    "cloud": 77,
+    "feelslike_c": 15.6,
+    "vis_km": 10.0,
+    "uv": 4.0,
+    "gust_kph": 9.4
+  }
+}

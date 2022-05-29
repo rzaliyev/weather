@@ -21,7 +21,7 @@ func (wt *WeatherTime) UnmarshalJSON(b []byte) error {
 }
 
 func (wt WeatherTime) MarshalJSON() ([]byte, error) {
-	return json.Marshal(time.Time(wt))
+	return json.Marshal(time.Time(wt).Format("2006-01-02 15:04"))
 }
 
 func (wt WeatherTime) Format(s string) string {
@@ -73,8 +73,8 @@ type Location struct {
 	Lat            float32     `json:"lat"`
 	Long           float32     `json:"lon"`
 	TzID           string      `json:"tz_id"`
-	LocalTimeEpoch int         `json:"localetime_epoch"`
-	LocalTime      WeatherTime `json:"localetime"`
+	LocalTimeEpoch int         `json:"localtime_epoch"`
+	LocalTime      WeatherTime `json:"localtime"`
 }
 
 type Current struct {
@@ -91,7 +91,7 @@ type Current struct {
 	Humidity         int     `json:"humidity"`
 	Cloud            int     `json:"cloud"`
 	FeelsLike        float32 `json:"feelslike_c"`
-	Vis              float32 `json:"vis"`
+	Vis              float32 `json:"vis_km"`
 	UV               float32 `json:"uv"`
 	Gust             float32 `json:"gust_kph"`
 }

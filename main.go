@@ -2,23 +2,27 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"sync"
 )
 
+var debug = flag.Bool("debug", false, "show orgingal respons in JSON format")
+
 func main() {
 
-	if len(os.Args) < 2 {
+	flag.Parse()
+
+	if len(flag.Args()) < 1 {
 		getWeather("auto:ip")
 	} else {
 		var wg sync.WaitGroup
-		for _, v := range os.Args[1:] {
+		for _, v := range flag.Args() {
 			wg.Add(1)
 			go func(query string) {
 				getWeather(query)
@@ -44,13 +48,28 @@ func getWeather(query string) {
 		log.Fatal(err)
 	}
 
-	weather := Response{}
-	if err = json.Unmarshal(body, &weather); err != nil {
-		log.Fatal(err)
+	weather := GetCurrentWeather(body)
+
+	if *debug {
+		var bs []byte
+		if bs, err = json.Marshal(weather); err != nil {
+			log.Fatal(err)
+		} else {
+			fmt.Println(string(bs))
+		}
+
+	} else {
+		printWeather(*weather)
 	}
 
-	printWeather(weather)
+}
 
+func GetCurrentWeather(b []byte) (resp *Response) {
+	resp = &Response{}
+	if err := json.Unmarshal(b, resp); err != nil {
+		log.Fatal(err)
+	}
+	return
 }
 
 func convertQuery(query string) string {
